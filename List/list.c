@@ -1,4 +1,5 @@
-
+#include <stddef.h>
+#include "list.h"
 
 struct element
 {
@@ -16,8 +17,15 @@ struct list
 struct list *create_list(int capacity)
 {
     struct list *newList = (struct list *)malloc(sizeof(struct list));
-    newList->capacity = capacity;
     newList->elements = (struct element *)malloc(sizeof(struct element) * capacity);
+
+    if (!newList)
+        return NULL;
+    if (!newList->elements)
+        return NULL;
+
+    newList->capacity = capacity;
+    newList->size = 0;
     return newList;
 }
 
@@ -27,8 +35,11 @@ void destory_list(struct list *oldList)
     free(oldList);
 }
 
-void add_to_list(void *value)
+void add_to_list(struct list *curr, char *value)
 {
-    // determine what it is and do something
-    // will need to overload this for the basic types declared in header
+    //
+    if (curr->size == curr->capacity)
+    {
+        // call list size increaser
+    }
 }
