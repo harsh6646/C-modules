@@ -35,7 +35,7 @@ void destory_list(struct list *oldList)
     free(oldList);
 }
 
-void add_to_list(struct list *curr, char *value)
+void add_to_list(struct list *curr, int value)
 {
     //
     if (curr->size == curr->capacity)
@@ -46,9 +46,26 @@ void add_to_list(struct list *curr, char *value)
     // go to next available spot in array and set type
     curr->elements[size].type = TYPE_CHAR;
     // create space of value and add it
-    char *temp_char = (char *)malloc(sizeof(char));
-    if (temp_char)
-        curr->elements[size].value = *value;
+    int *temp_int = (int *)malloc(sizeof(int));
+    if (temp_int)
+        *temp_int = value;
+    curr->elements[size].value = temp_int;
+    curr->elements[size].type = TYPE_INT;
+}
+
+void remove_from_list(struct list *curr, int index)
+{
+    //
+    if (curr->size < (int)(curr->capacity / 4))
+    {
+        _decrease_list_size(curr);
+    }
+    free(curr->elements[index].value);
+    for (int i = index + 1; i < curr->size; i++)
+    {
+        curr->elements[i - 1] = curr->elements[i];
+    }
+    curr->size -= 1;
 }
 
 void _increase_list_size(struct list *curr)
@@ -56,7 +73,7 @@ void _increase_list_size(struct list *curr)
     int curr_size = curr->size;
     int new_capacity = curr_size * 2;
     // create a array of double size
-    struct element *new_array = (struct element *)malloc(sizeof(struct element) * curr_size * 2);
+    struct element *new_array = (struct element *)malloc(sizeof(struct element) * new_capacity);
     if (new_array)
     {
         struct element *old_array = curr->elements;
@@ -71,4 +88,19 @@ void _increase_list_size(struct list *curr)
         // no leaky boi
         free(old_array);
     }
+}
+
+void _decrease_list_size(struct list *curr)
+{
+    int new_capacity = (int)(curr->capacity / 2);
+    struct element *new_array = (struct element *)malloc(sizeof(struct element) * new_capacity);
+    // copy to new array
+    for (int i = 0; i < curr->size; i++)
+    {
+        new_array[i] = curr->elements[i];
+    }
+    // free old array
+    free(curr->elements);
+    // update the list values
+    curr->elements = new_array;
 }
