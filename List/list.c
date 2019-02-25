@@ -31,6 +31,14 @@ struct list *create_list(int capacity)
 
 void destory_list(struct list *oldList)
 {
+    struct element *_elements = oldList->elements;
+    // free malloc'd values
+    for (int i = 0; i < oldList->size; i++)
+    {
+        free(_elements[i].value);
+    }
+    // free array
+    // free the data structure
     free(oldList->elements);
     free(oldList);
 }
@@ -43,14 +51,13 @@ void add_to_list(struct list *curr, int value)
         _increase_list_size(curr);
     }
     int size = curr->size;
-    // go to next available spot in array and set type
-    curr->elements[size].type = TYPE_CHAR;
     // create space of value and add it
     int *temp_int = (int *)malloc(sizeof(int));
     if (temp_int)
         *temp_int = value;
     curr->elements[size].value = temp_int;
     curr->elements[size].type = TYPE_INT;
+    curr->size++;
 }
 
 void remove_from_list(struct list *curr, int index)
@@ -65,7 +72,7 @@ void remove_from_list(struct list *curr, int index)
     {
         curr->elements[i - 1] = curr->elements[i];
     }
-    curr->size -= 1;
+    curr->size--;
 }
 
 void _increase_list_size(struct list *curr)
