@@ -43,7 +43,7 @@ void destory_list(struct list *oldList)
     free(oldList);
 }
 
-void add_to_list(struct list *curr, int value)
+struct list *add_to_list(struct list *curr, int value)
 {
     //
     if (curr->size == curr->capacity)
@@ -55,52 +55,59 @@ void add_to_list(struct list *curr, int value)
     int *temp_int = (int *)malloc(sizeof(int));
     if (temp_int)
         *temp_int = value;
+    else
+        return NULL;
     curr->elements[size].value = temp_int;
     curr->elements[size].type = TYPE_INT;
     curr->size++;
+    return curr;
 }
 
-void remove_from_list(struct list *curr, int index)
+struct list *remove_from_list(struct list *curr, int index)
 {
-    //
-    if (curr->size < (int)(curr->capacity / 4))
-    {
-        _decrease_list_size(curr);
-    }
     free(curr->elements[index].value);
     for (int i = index + 1; i < curr->size; i++)
     {
         curr->elements[i - 1] = curr->elements[i];
     }
     curr->size--;
+    if (curr->size < (int)(curr->capacity / 4))
+    {
+        if (!_decrease_list_size(curr))
+            return NULL;
+    }
+    return curr;
 }
 
-void _increase_list_size(struct list *curr)
+struct list *_increase_list_size(struct list *curr)
 {
     int curr_size = curr->size;
     int new_capacity = curr_size * 2;
     // create a array of double size
     struct element *new_array = (struct element *)malloc(sizeof(struct element) * new_capacity);
-    if (new_array)
+    if (!new_array)
+        return NULL;
+
+    struct element *old_array = curr->elements;
+    // copy over elements
+    for (int i = 0; i < curr_size; i++)
     {
-        struct element *old_array = curr->elements;
-        // copy over elements
-        for (int i = 0; i < curr_size; i++)
-        {
-            new_array[i] = old_array[i];
-        }
-        // update list data
-        curr->capacity = new_capacity;
-        curr->elements = new_array;
-        // no leaky boi
-        free(old_array);
+        new_array[i] = old_array[i];
     }
+    // update list data
+    curr->capacity = new_capacity;
+    curr->elements = new_array;
+    // no leaky boi
+    free(old_array);
+    return curr;
 }
 
-void _decrease_list_size(struct list *curr)
+struct list *_decrease_list_size(struct list *curr)
 {
     int new_capacity = (int)(curr->capacity / 2);
     struct element *new_array = (struct element *)malloc(sizeof(struct element) * new_capacity);
+    if (!new_array)
+        return NULL;
     // copy to new array
     for (int i = 0; i < curr->size; i++)
     {
@@ -110,4 +117,7 @@ void _decrease_list_size(struct list *curr)
     free(curr->elements);
     // update the list values
     curr->elements = new_array;
+    return curr;
 }
+
+// use memcpy and use function pointers to wrap different data types around 1 function
