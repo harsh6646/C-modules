@@ -6,6 +6,7 @@ struct element
     void *value;
     int type;
     int length;
+    int size;
 };
 
 struct list
@@ -86,6 +87,7 @@ struct list *_add(struct list *curr, int value_type, void *value_location, int v
     curr->elements[size].value = value;
     curr->elements[size].type = value_type;
     curr->elements[size].length = value_length;
+    curr->elements[size].size = value_length * value_size;
     curr->size++;
     return curr;
 }
@@ -147,4 +149,27 @@ struct list *_decrease_list_size(struct list *curr)
     return curr;
 }
 
-// use memcpy and use function pointers to wrap different data types around 1 function
+struct element *get(struct list *curr, int index)
+{
+    // check if index valid
+    if (index >= 0 && index < curr->size)
+        return curr->elements[index];
+    else
+        return NULL;
+}
+
+struct element find(struct list *curr, int type, void *value, int size)
+{
+    // loop through and compare the values of
+    for (int i = 0; i < curr->size; i++)
+    {
+        if (curr->elements[i].size == size)
+        {
+            void *value = curr->elements[i].value;
+            if (memcmp(value, value, size))
+            {
+                return curr->elements[i];
+            }
+        }
+    }
+}
